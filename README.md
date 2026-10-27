@@ -6,7 +6,7 @@ This repository provides a personal, customized `pwntools` exploit template for 
 The base template is **heavily based on the excellent work by [Crypto-Cat](https://github.com/Crypto-Cat)**, specifically their `official_template.py` from the [CTF repository](https://github.com/Crypto-Cat/CTF).
 
 ## Setup
-`pwn template` (from pwntools) does **not** read templates from `~/.config/pwntools/templates/` — that directory isn't used anywhere in pwntools. It always loads `pwnup.mako` from pwntools' own installed package directory. So to make this your default template, you need to overwrite the file *inside your pwntools installation*.
+`pwn template` (from pwntools) always loads `pwnup.mako` from pwntools' own installed package directory. So to make this your default template, you need to overwrite the file *inside your pwntools installation*.
 
 1. Clone this repo:
    ```bash
