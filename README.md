@@ -17,9 +17,10 @@ The base template is **heavily based on the excellent work by [Crypto-Cat](https
 2. Find where pwntools is installed and overwrite its bundled template:
    ```bash
    PWN_TEMPLATES=$(python3 -c "import pwnlib, os; print(os.path.join(os.path.dirname(pwnlib.__file__), 'data', 'templates'))")
-   cp pwnup.mako "$PWN_TEMPLATES/pwnup.mako"
+   sudo cp "$PWN_TEMPLATES/pwnup.mako" "$PWN_TEMPLATES/pwnup.mako.bak"   # back up the stock template
+   sudo cp pwnup.mako "$PWN_TEMPLATES/pwnup.mako"
    ```
-   (Back up the original first with `cp "$PWN_TEMPLATES/pwnup.mako" "$PWN_TEMPLATES/pwnup.mako.bak"` if you ever want to restore the stock template.)
+   (`sudo` is needed when pwntools is installed system-wide, e.g. `/usr/lib/python3/dist-packages` on Kali. Skip it inside a virtualenv. To restore the stock template: `sudo apt install --reinstall python3-pwntools`, or copy the `.bak` back.)
 
    If you installed pwntools in a virtualenv, activate it first so the `python3 -c ...` call resolves to the right pwnlib.
 
@@ -29,7 +30,15 @@ The base template is **heavily based on the excellent work by [Crypto-Cat](https
    ```
 
 ## Note on this template
-`pwnup.mako` here is a static skeleton (no Mako templating logic, no `<%page args="..."/>` directive) — it's meant as a personal starting-point script you copy per challenge and edit `exe`, `offset`, and the payload by hand, not a dynamic template that reacts to `pwn template`'s `--host`/`--port`/etc. flags. If you want it to actually consume those flags, see pwntools' own [`pwnup.mako`](https://github.com/Gallopsled/pwntools/blob/dev/pwnlib/data/templates/pwnup.mako) for the Mako syntax (`<%page args=...%>`, `${...}` substitutions) to add.
+`pwn template` renders `pwnup.mako` with Mako and passes it 8 positional arguments (`exe, host, port, user, password, libc, path, quiet`). Mako can only accept them if the file starts with a `<%page args="..."/>` line, so **that line must stay as line 1 of `pwnup.mako`**. Without it, `pwn template` crashes with:
+
+```
+TypeError: render_body() takes 1 positional argument but 9 were given
+```
+
+The rest of the file is a static skeleton: it does not use the `--host`/`--port` flags, so edit `exe`, `offset` and the payload by hand. To consume those values, use Mako substitutions such as `${binary}`, as in pwntools' own [`pwnup.mako`](https://github.com/Gallopsled/pwntools/blob/dev/pwnlib/data/templates/pwnup.mako).
+
+Mako treats `${...}`, `<%`, and lines starting with `%` or `##` as special. Avoid those in the skeleton unless you mean them as template syntax.
 
 ## Usage
 Once installed, every `pwn template` invocation will use this skeleton. You can also just copy `pwnup.mako` manually into a challenge directory, rename it `exploit.py`, and edit the `exe`, offset, and payload sections directly.
